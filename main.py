@@ -8,15 +8,16 @@ from datetime import datetime, timedelta
 
 COMPETITIONS = {
     "1": "FIFA World Cup",
+    "3": "FIFA World Cup - Qualification Europe",
+    "4": "FIFA World Cup - Qualification Africa",
+    "5": "FIFA World Cup - Qualification Asia",
+    "6": "FIFA World Cup - Qualification Oceania",
+    "7": "FIFA World Cup - Qualification CONCACAF",
+    "8": "FIFA World Cup - Qualification South America",
+    "10": "Friendlies (International)",
     "39": "Premier League (England)",
     "135": "Serie A (Italy)",
     "140": "La Liga (Spain)",
-    "78": "Bundesliga (Germany)",
-    "61": "Ligue 1 (France)",
-    "2": "UEFA Champions League",
-    "88": "Eredivisie (Netherlands)",
-    "94": "Primeira Liga (Portugal)",
-    "40": "Championship (England)",
     "71": "Brasileirão Série A (Brazil)"
 }
 
