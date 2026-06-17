@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Predictions Dashboard</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        h1 {
+            margin-top: 0;
+            color: #1a202c;
+        }
+        .controls {
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        select, button {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+        button {
+            background-color: #3182ce;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2b6cb0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background-color: #ebf8ff;
+            color: #2b6cb0;
+        }
+        .badge {
+            background-color: #edf2f7;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .error-message {
+            color: #e53e3e;
+            padding: 15px;
+            background-color: #fff5f5;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Football Predictions Dashboard</h1>
+        <div class="controls">
+            <select id="competition">
+                <option value="PL">Premier League</option>
+                <option value="SA">Serie A</option>
+                <option value="PD">La Liga</option>
+                <option value="BL1">Bundesliga</option>
+                <option value="FL1">Ligue 1</option>
+                <option value="CL">Champions League</option>
+                <option value="DED">Eredivisie</option>
+                <option value="PPL">Primeira Liga</option>
+                <option value="ELC">Championship</option>
+                <option value="BSA">Brasileirao</option>
+            </select>
+            <button onclick="loadPredictions()">Load Analysis</button>
+        </div>
+        <div id="status-container"></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Match</th>
+                    <th>Prediction 1X2</th>
+                    <th>Probabilities (1/X/2)</th>
+                    <th>Over/Under 2.5</th>
+                    <th>BTTS</th>
+                </tr>
+            </thead>
+            <tbody id="predictions-body">
+                <tr>
+                    <td colspan="6">Select a competition and click load.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadPredictions() {
+            const compCode = document.getElementById("competition").value;
+            const tBody = document.getElementById("predictions-body");
+            const statusContainer = document.getElementById("status-container");
+            
+            statusContainer.innerHTML = "";
+            tBody.innerHTML = "<tr><td colspan='6'>Loading updated analytics...</td></tr>";
+
+            try {
+                const response = await fetch(`./data/${compCode}.json`);
+                if (!response.ok) {
+                    throw new Error("Data unavailable for this competition.");
+                }
+                const data = await response.json();
+                tBody.innerHTML = "";
+
+                if (!data.predictions || data.predictions.length === 0) {
+                    tBody.innerHTML = "<tr><td colspan='6'>No upcoming matches scheduled for the next 7 days.</td></tr>";
+                    return;
+                }
+
+                data.predictions.forEach(match => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${match.Date} ${match.Time}</td>
+                        <td><strong>${match.HomeTeam} vs ${match.AwayTeam}</strong></td>
+                        <td><span class="badge">${match.Prediction_1X2}</span></td>
+                        <td>${match.Probability_1}% / ${match.Probability_X}% / ${match.Probability_2}%</td>
+                        <td>${match.Over_Under_2.5} (${match.Probability_Over}%)</td>
+                        <td>${match.BTTS} (${match.Probability_BTTS}%)</td>
+                    `;
+                    tBody.appendChild(row);
+                });
+            } catch (err) {
+                tBody.innerHTML = `<tr><td colspan='6' class='error-message'>Error: ${err.message}</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>
