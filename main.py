@@ -6,104 +6,71 @@ import requests
 import pandas as pd
 from datetime import datetime, timedelta
 
-FREE_COMPETITIONS = {
-    "CL": "UEFA Champions League",
-    "PL": "Premier League (England)",
-    "PD": "La Liga (Spain)",
-    "BL1": "Bundesliga (Germany)",
-    "SA": "Serie A (Italy)",
-    "FL1": "Ligue 1 (France)",
-    "DED": "Eredivisie (Netherlands)",
-    "PPL": "Primeira Liga (Portugal)",
-    "ELC": "Championship (England, 2nd tier)",
-    "BSA": "Brasileirão Série A (Brazil)"
+COMPETITIONS = {
+    "1": "FIFA World Cup",
+    "39": "Premier League (England)",
+    "135": "Serie A (Italy)",
+    "140": "La Liga (Spain)",
+    "78": "Bundesliga (Germany)",
+    "61": "Ligue 1 (France)",
+    "2": "UEFA Champions League",
+    "88": "Eredivisie (Netherlands)",
+    "94": "Primeira Liga (Portugal)",
+    "40": "Championship (England)",
+    "71": "Brasileirão Série A (Brazil)"
 }
 
-class RateLimiter:
-    def __init__(self, requests_per_minute=10):
-        self.min_interval = 60.0 / requests_per_minute
-        self._last_call = 0.0
-
-    def wait(self):
-        elapsed = time.time() - self._last_call
-        if elapsed < self.min_interval:
-            time.sleep(self.min_interval - elapsed)
-        self._last_call = time.time()
-
-class APIError(Exception):
-    pass
-
 class FootballPredictor:
-    def __init__(self, api_token, requests_per_minute=10):
-        if not api_token:
-            raise ValueError("Missing API token.")
-        self.api_token = api_token
-        self.base_url = "https://api.football-data.org/v4"
-        self.headers = {"X-Auth-Token": self.api_token}
+    def __init__(self, api_key):
+        if not api_key:
+            raise ValueError("Missing API key.")
+        self.api_key = api_key
+        self.base_url = "https://v3.football.api-sports.io"
+        self.headers = {
+            "x-apisports-key": self.api_key,
+            "x-rapidapi-host": "v3.football.api-sports.io"
+        }
         self.team_data = {}
         self.match_data = pd.DataFrame()
-        self.id_to_name = {}
-        self.name_to_id = {}
-        self._rate_limiter = RateLimiter(requests_per_minute)
 
-    def _get(self, url, params=None):
-        self._rate_limiter.wait()
+    def _get(self, endpoint, params=None):
+        url = f"{self.base_url}/{endpoint}"
         try:
             response = requests.get(url, headers=self.headers, params=params, timeout=15)
-        except requests.RequestException as e:
-            raise APIError(f"Connection error: {e}") from e
-
-        if response.status_code == 200:
-            return response.json()
-        if response.status_code == 429:
-            time.sleep(60)
-            return self._get(url, params)
-        if response.status_code in [403, 404]:
+            if response.status_code == 200:
+                res_json = response.json()
+                if "errors" in res_json and res_json["errors"]:
+                    return None
+                return res_json
             return None
-        raise APIError(f"API error {response.status_code}: {response.text[:200]}")
+        except requests.RequestException:
+            return None
 
-    def load_competition_data(self, competition_code, season=None):
-        if not season:
-            current_year = datetime.now().year
-            season = current_year if datetime.now().month > 7 else current_year - 1
-
-        if not self._load_teams(competition_code, season):
-            return False
-        if not self._load_matches(competition_code, season):
-            return False
-        self._process_team_data()
-        return True
-
-    def _load_teams(self, competition_code, season):
-        url = f"{self.base_url}/competitions/{competition_code}/teams"
-        data = self._get(url, params={"season": season})
-        if not data or "teams" not in data:
-            return False
-        self.id_to_name = {team["id"]: team["name"] for team in data["teams"]}
-        self.name_to_id = {team["name"]: team["id"] for team in data["teams"]}
-        return True
-
-    def _load_matches(self, competition_code, season):
-        url = f"{self.base_url}/competitions/{competition_code}/matches"
-        data = self._get(url, params={"season": season})
-        if not data or "matches" not in data:
+    def load_competition_data(self, league_id, season):
+        url = "fixtures"
+        params = {"league": league_id, "season": season, "status": "FT"}
+        data = self._get(url, params=params)
+        
+        if not data or "response" not in data or not data["response"]:
             return False
 
         matches = []
-        for match in data["matches"]:
-            if match["status"] != "FINISHED":
-                continue
-            home_goals = match["score"]["fullTime"]["home"]
-            away_goals = match["score"]["fullTime"]["away"]
+        for item in data["response"]:
+            fixture = item["fixture"]
+            teams = item["teams"]
+            goals = item["goals"]
+            
+            home_goals = goals["home"]
+            away_goals = goals["away"]
             if home_goals is None or away_goals is None:
                 continue
 
             m = {
-                "Date": match["utcDate"][:10],
-                "HomeTeamID": match["homeTeam"]["id"],
-                "AwayTeamID": match["awayTeam"]["id"],
-                "HomeTeam": self.id_to_name.get(match["homeTeam"]["id"], "Unknown"),
-                "AwayTeam": self.id_to_name.get(match["awayTeam"]["id"], "Unknown"),
+                "Date": fixture["date"][:10],
+                "HomeTeamID": teams["home"]["id"],
+                "AwayTeamID": teams["away"]["id"],
+                "HomeTeam": teams["home"]["name"],
+                "AwayTeam": teams["away"]["name"],
                 "HomeGoals": home_goals,
                 "AwayGoals": away_goals,
             }
@@ -118,6 +85,7 @@ class FootballPredictor:
             matches.append(m)
 
         self.match_data = pd.DataFrame(matches)
+        self._process_team_data()
         return True
 
     def _process_team_data(self):
@@ -127,9 +95,16 @@ class FootballPredictor:
 
         team_ids = set(self.match_data["HomeTeamID"].tolist() + self.match_data["AwayTeamID"].tolist())
         for team_id in team_ids:
-            team_name = self.id_to_name.get(team_id, f"ID_{team_id}")
             home_matches = self.match_data[self.match_data["HomeTeamID"] == team_id]
             away_matches = self.match_data[self.match_data["AwayTeamID"] == team_id]
+            
+            team_name = ""
+            if not home_matches.empty:
+                team_name = home_matches.iloc[0]["HomeTeam"]
+            elif not away_matches.empty:
+                team_name = away_matches.iloc[0]["AwayTeam"]
+            else:
+                team_name = f"Team_{team_id}"
 
             home_wins = len(home_matches[home_matches["Result"] == "1"])
             home_draws = len(home_matches[home_matches["Result"] == "X"])
@@ -171,25 +146,24 @@ class FootballPredictor:
                 "total_points": (home_wins + away_wins) * 3 + (home_draws + away_draws),
             }
 
-    def load_upcoming_matches(self, competition_code, date_from, date_to):
-        url = f"{self.base_url}/matches"
-        params = {"competitions": competition_code, "dateFrom": date_from, "dateTo": date_to}
+    def load_upcoming_matches(self, league_id, season, date_from, date_to):
+        url = "fixtures"
+        params = {"league": league_id, "season": season, "from": date_from, "to": date_to}
         data = self._get(url, params=params)
         
-        if not data or "matches" not in data:
+        if not data or "response" not in data or not data["response"]:
             return []
 
         upcoming_matches = []
-        for match in data["matches"]:
-            home_id = match["homeTeam"]["id"]
-            away_id = match["awayTeam"]["id"]
-            if home_id in self.id_to_name and away_id in self.id_to_name:
-                upcoming_matches.append({
-                    "Date": match["utcDate"][:10],
-                    "Time": match["utcDate"][11:16],
-                    "HomeTeam": self.id_to_name[home_id],
-                    "AwayTeam": self.id_to_name[away_id],
-                })
+        for item in data["response"]:
+            fixture = item["fixture"]
+            teams = item["teams"]
+            upcoming_matches.append({
+                "Date": fixture["date"][:10],
+                "Time": fixture["date"][11:16],
+                "HomeTeam": teams["home"]["name"],
+                "AwayTeam": teams["away"]["name"],
+            })
         return upcoming_matches
 
     def predict_match(self, home_team, away_team):
@@ -245,13 +219,15 @@ class FootballPredictor:
         }
 
 if __name__ == "__main__":
-    API_TOKEN = os.environ.get("FOOTBALL_DATA_TOKEN")
-    if not API_TOKEN:
+    API_KEY = os.environ.get("API_FOOTBALL_KEY")
+    if not API_KEY:
         sys.exit(1)
 
-    predictor = FootballPredictor(API_TOKEN)
+    predictor = FootballPredictor(API_KEY)
 
     today = datetime.now()
+    current_season = today.year if today.month > 7 else today.year - 1
+    
     date_from = today.strftime("%Y-%m-%d")
     date_to = (today + timedelta(days=7)).strftime("%Y-%m-%d")
 
@@ -264,11 +240,13 @@ if __name__ == "__main__":
 
     all_predictions_count = 0
 
-    for code, name in FREE_COMPETITIONS.items():
-        if not predictor.load_competition_data(code):
+    for code, name in COMPETITIONS.items():
+        time.sleep(1)
+        
+        if not predictor.load_competition_data(code, current_season):
             continue
             
-        upcoming = predictor.load_upcoming_matches(code, date_from, date_to)
+        upcoming = predictor.load_upcoming_matches(code, current_season, date_from, date_to)
         
         predictions_list = []
         for match in upcoming:
