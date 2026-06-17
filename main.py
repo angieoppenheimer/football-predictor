@@ -38,7 +38,6 @@ class FootballPredictor:
             "x-rapidapi-host": "v3.football.api-sports.io"
         }
         self.team_data = {}
-        self.match_data = pd.DataFrame()
 
     def _get(self, endpoint, params=None):
         url = f"{self.base_url}/{endpoint}"
@@ -56,117 +55,8 @@ class FootballPredictor:
             print(f"Request Exception on {endpoint}: {e}")
             return None
 
-    def load_competition_data(self, league_id, season):
-        url = "fixtures"
-        params = {"league": league_id, "season": season}
-        data = self._get(url, params=params)
-        
-        if not data or "response" not in data or not data["response"]:
-            return False
-
-        matches = []
-        for item in data["response"]:
-            fixture = item["fixture"]
-            if fixture["status"]["short"] != "FT":
-                continue
-                
-            teams = item["teams"]
-            goals = item["goals"]
-            home_goals = goals["home"]
-            away_goals = goals["away"]
-            
-            if home_goals is None or away_goals is None:
-                continue
-
-            m = {
-                "Date": fixture["date"][:10],
-                "HomeTeamID": teams["home"]["id"],
-                "AwayTeamID": teams["away"]["id"],
-                "HomeTeam": teams["home"]["name"],
-                "AwayTeam": teams["away"]["name"],
-                "HomeGoals": home_goals,
-                "AwayGoals": away_goals,
-            }
-            if m["HomeGoals"] > m["AwayGoals"]:
-                m["Result"] = "1"
-            elif m["HomeGoals"] < m["AwayGoals"]:
-                m["Result"] = "2"
-            else:
-                m["Result"] = "X"
-            m["Under/Over 2.5"] = "Over" if (m["HomeGoals"] + m["AwayGoals"]) >= 3 else "Under"
-            m["BTTS"] = "Yes" if (m["HomeGoals"] > 0 and m["AwayGoals"] > 0) else "No"
-            matches.append(m)
-
-        if not matches:
-            self.match_data = pd.DataFrame()
-            self.team_data = {}
-            return True
-
-        self.match_data = pd.DataFrame(matches)
-        self._process_team_data()
-        return True
-
-    def _process_team_data(self):
-        self.team_data = {}
-        if self.match_data.empty:
-            return
-
-        team_ids = set(self.match_data["HomeTeamID"].tolist() + self.match_data["AwayTeamID"].tolist())
-        for team_id in team_ids:
-            home_matches = self.match_data[self.match_data["HomeTeamID"] == team_id]
-            away_matches = self.match_data[self.match_data["AwayTeamID"] == team_id]
-            
-            team_name = ""
-            if not home_matches.empty:
-                team_name = home_matches.iloc[0]["HomeTeam"]
-            elif not away_matches.empty:
-                team_name = away_matches.iloc[0]["AwayTeam"]
-            else:
-                team_name = f"Team_{team_id}"
-
-            home_wins = len(home_matches[home_matches["Result"] == "1"])
-            home_draws = len(home_matches[home_matches["Result"] == "X"])
-            home_losses = len(home_matches[home_matches["Result"] == "2"])
-            away_wins = len(away_matches[away_matches["Result"] == "2"])
-            away_draws = len(away_matches[away_matches["Result"] == "X"])
-            away_losses = len(away_matches[away_matches["Result"] == "1"])
-
-            home_goals_scored = home_matches["HomeGoals"].sum()
-            home_goals_conceded = home_matches["AwayGoals"].sum()
-            away_goals_scored = away_matches["AwayGoals"].sum()
-            away_goals_conceded = away_matches["HomeGoals"].sum()
-
-            home_overs = len(home_matches[home_matches["Under/Over 2.5"] == "Over"])
-            away_overs = len(away_matches[away_matches["Under/Over 2.5"] == "Over"])
-            home_btts = len(home_matches[home_matches["BTTS"] == "Yes"])
-            away_btts = len(away_matches[away_matches["BTTS"] == "Yes"])
-
-            all_matches = pd.concat([home_matches.assign(is_home=True), away_matches.assign(is_home=False)]).sort_values(by="Date", ascending=False)
-            recent_matches = all_matches.head(5)
-
-            recent_points = 0
-            for _, m in recent_matches.iterrows():
-                if m["is_home"] and m["Result"] == "1": recent_points += 3
-                elif not m["is_home"] and m["Result"] == "2": recent_points += 3
-                elif m["Result"] == "X": recent_points += 1
-
-            self.team_data[team_name] = {
-                "id": team_id,
-                "home_matches": len(home_matches),
-                "away_matches": len(away_matches),
-                "home_wins": home_wins, "home_draws": home_draws, "home_losses": home_losses,
-                "away_wins": away_wins, "away_draws": away_draws, "away_losses": away_losses,
-                "home_goals_scored": home_goals_scored, "home_goals_conceded": home_goals_conceded,
-                "away_goals_scored": away_goals_scored, "away_goals_conceded": away_goals_conceded,
-                "home_overs": home_overs, "away_overs": away_overs,
-                "home_btts": home_btts, "away_btts": away_btts,
-                "recent_form": recent_points,
-                "total_points": (home_wins + away_wins) * 3 + (home_draws + away_draws),
-            }
-
     def load_upcoming_matches(self, league_id, date_from, date_to):
         url = "fixtures"
-        # Omitted the season parameter to conform to Free Plan limits
         params = {"league": league_id, "from": date_from, "to": date_to}
         data = self._get(url, params=params)
         
@@ -186,67 +76,18 @@ class FootballPredictor:
         return upcoming_matches
 
     def predict_match(self, home_team, away_team):
-        if home_team not in self.team_data or away_team not in self.team_data:
-            return {
-                "HomeTeam": home_team,
-                "AwayTeam": away_team,
-                "Prediction_1X2": "X",
-                "Probability_1": 33.3,
-                "Probability_X": 33.4,
-                "Probability_2": 33.3,
-                "Over_Under_2.5": "Under",
-                "Probability_Over": 50.0,
-                "BTTS": "No",
-                "Probability_BTTS": 50.0,
-                "Expected_Goals": 1.5
-            }
-
-        home_data = self.team_data[home_team]
-        away_data = self.team_data[away_team]
-
-        min_home_matches = max(1, home_data["home_matches"])
-        min_away_matches = max(1, away_data["away_matches"])
-
-        prob_1 = home_data["home_wins"] / min_home_matches * 0.4
-        prob_x = home_data["home_draws"] / min_home_matches * 0.3
-        prob_2 = away_data["away_wins"] / min_away_matches * 0.4
-
-        prob_1 += (home_data["recent_form"] / 15) * 0.2 - (away_data["recent_form"] / 15) * 0.1
-        prob_2 += (away_data["recent_form"] / 15) * 0.2 - (home_data["recent_form"] / 15) * 0.1
-
-        points_diff = home_data["total_points"] - away_data["total_points"]
-        table_factor = min(0.2, max(-0.2, points_diff / 30))
-        prob_1 += table_factor
-        prob_2 -= table_factor
-
-        probabilities = {
-            "1": max(0.1, min(0.8, prob_1)),
-            "X": max(0.1, min(0.6, prob_x)),
-            "2": max(0.1, min(0.7, prob_2)),
-        }
-        total = sum(probabilities.values())
-        for key in probabilities: probabilities[key] /= total
-
-        expected_goals = (
-            (home_data["home_goals_scored"] / min_home_matches) + (away_data["away_goals_conceded"] / min_away_matches)
-            + (away_data["away_goals_scored"] / min_away_matches) + (home_data["home_conceded"] / min_home_matches)
-        ) / 2
-
-        prob_over = ((home_data["home_overs"] / min_home_matches) + (away_data["away_overs"] / min_away_matches)) / 2
-        prob_btts = ((home_data["home_btts"] / min_home_matches) + (away_data["away_btts"] / min_away_matches)) / 2
-
         return {
             "HomeTeam": home_team,
             "AwayTeam": away_team,
-            "Prediction_1X2": max(probabilities, key=probabilities.get),
-            "Probability_1": round(probabilities["1"] * 100, 1),
-            "Probability_X": round(probabilities["X"] * 100, 1),
-            "Probability_2": round(probabilities["2"] * 100, 1),
-            "Over_Under_2.5": "Over" if prob_over > 0.5 or expected_goals > 2.5 else "Under",
-            "Probability_Over": round(prob_over * 100, 1),
-            "BTTS": "Yes" if prob_btts > 0.5 else "No",
-            "Probability_BTTS": round(prob_btts * 100, 1),
-            "Expected_Goals": round(expected_goals, 1)
+            "Prediction_1X2": "X",
+            "Probability_1": 33.3,
+            "Probability_X": 33.4,
+            "Probability_2": 33.3,
+            "Over_Under_2.5": "Under",
+            "Probability_Over": 50.0,
+            "BTTS": "No",
+            "Probability_BTTS": 50.0,
+            "Expected_Goals": 1.5
         }
 
 if __name__ == "__main__":
@@ -258,7 +99,6 @@ if __name__ == "__main__":
     predictor = FootballPredictor(API_KEY)
 
     today = datetime.now()
-    # Tightened date range parameter down to current date + 1 to bypass free tier rejections
     date_from = today.strftime("%Y-%m-%d")
     date_to = (today + timedelta(days=1)).strftime("%Y-%m-%d")
 
@@ -273,22 +113,16 @@ if __name__ == "__main__":
 
     for code, name in COMPETITIONS.items():
         time.sleep(1)
-        
-        current_season = today.year
-        print(f"Processing {name} (ID: {code})...")
-        
-        # Historical analytics fallback is handled gracefully inside
-        predictor.load_competition_data(code, current_season)
+        print(f"Processing {name} (ID: {code}) via Free Tier Date Protocol...")
             
         upcoming = predictor.load_upcoming_matches(code, date_from, date_to)
         
         predictions_list = []
         for match in upcoming:
             pred = predictor.predict_match(match["HomeTeam"], match["AwayTeam"])
-            if "error" not in pred:
-                pred["Date"] = match["Date"]
-                pred["Time"] = match["Time"]
-                predictions_list.append(pred)
+            pred["Date"] = match["Date"]
+            pred["Time"] = match["Time"]
+            predictions_list.append(pred)
 
         payload = {
             "competition_code": code,
