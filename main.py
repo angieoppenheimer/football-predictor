@@ -8,17 +8,23 @@ from datetime import datetime, timedelta
 
 COMPETITIONS = {
     "1": "FIFA World Cup",
-    "3": "FIFA World Cup - Qualification Europe",
-    "4": "FIFA World Cup - Qualification Africa",
-    "5": "FIFA World Cup - Qualification Asia",
-    "6": "FIFA World Cup - Qualification Oceania",
-    "7": "FIFA World Cup - Qualification CONCACAF",
-    "8": "FIFA World Cup - Qualification South America",
-    "10": "Friendlies (International)",
-    "39": "Premier League (England)",
-    "135": "Serie A (Italy)",
-    "140": "La Liga (Spain)",
-    "71": "Brasileirão Série A (Brazil)"
+    "15": "FIFA Club World Cup",
+    "12": "FIFA Women's World Cup",
+    "13": "FIFA U-20 World Cup",
+    "14": "FIFA U-17 World Cup",
+    "1024": "FIFA Women's U-20 World Cup",
+    "1023": "FIFA Women's U-17 World Cup",
+    "6": "FIFA Confederations Cup",
+    "30": "FIFA World Cup Qualification CONMEBOL",
+    "31": "FIFA World Cup Qualification CONCACAF",
+    "32": "FIFA World Cup Qualification UEFA",
+    "33": "FIFA World Cup Qualification CAF",
+    "34": "FIFA World Cup Qualification AFC",
+    "35": "FIFA World Cup Qualification OFC",
+    "36": "FIFA World Cup Qualification Intercontinental Play-offs",
+    "40": "FIFA Women's World Cup Qualification UEFA",
+    "1017": "FIFA Women's World Cup Qualification OFC",
+    "960": "FIFA Women's World Cup Qualification Intercontinental Play-offs"
 }
 
 class FootballPredictor:
@@ -41,16 +47,17 @@ class FootballPredictor:
             if response.status_code == 200:
                 res_json = response.json()
                 if "errors" in res_json and res_json["errors"]:
-                    print(f"API Error Log: {res_json['errors']}")
+                    print(f"API Error [{endpoint}]: {res_json['errors']}")
                     return None
                 return res_json
+            print(f"HTTP Error {response.status_code} on {endpoint}")
             return None
-        except requests.RequestException:
+        except requests.RequestException as e:
+            print(f"Request Exception on {endpoint}: {e}")
             return None
 
     def load_competition_data(self, league_id, season):
         url = "fixtures"
-        # Per la Coppa del Mondo cerchiamo sia i match finiti (FT) che quelli in corso o passati della stagione per fare uno storico minimo
         params = {"league": league_id, "season": season}
         data = self._get(url, params=params)
         
@@ -90,7 +97,6 @@ class FootballPredictor:
             m["BTTS"] = "Yes" if (m["HomeGoals"] > 0 and m["AwayGoals"] > 0) else "No"
             matches.append(m)
 
-        # Se non ci sono match passati (inizio torneo), creiamo una struttura vuota ma valida per non far fallire la pipeline
         if not matches:
             self.match_data = pd.DataFrame()
             self.team_data = {}
@@ -179,7 +185,6 @@ class FootballPredictor:
         return upcoming_matches
 
     def predict_match(self, home_team, away_team):
-        # Se mancano i dati analitici del profilo (torneo appena iniziato), restituiamo una predizione neutrale basata sul blasone/default
         if home_team not in self.team_data or away_team not in self.team_data:
             return {
                 "HomeTeam": home_team,
@@ -267,11 +272,11 @@ if __name__ == "__main__":
     for code, name in COMPETITIONS.items():
         time.sleep(1)
         
-        current_season = today.year if code == "1" else (today.year if today.month > 7 else today.year - 1)
+        current_season = today.year
         print(f"Processing {name} (ID: {code}) for season {current_season}...")
         
         if not predictor.load_competition_data(code, current_season):
-            print(f"Skipping {name}: Connection issue or invalid response.")
+            print(f"Skipping {name}: Failed to initialize competition structure.")
             continue
             
         upcoming = predictor.load_upcoming_matches(code, current_season, date_from, date_to)
@@ -312,4 +317,4 @@ if __name__ == "__main__":
     with open("README.md", "w", encoding="utf-8") as readme_file:
         readme_file.write(readme_content)
     
-    print("Pipeline completed successfully.")
+    print("Pipeline executed successfully.")
