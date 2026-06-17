@@ -1,7 +1,83 @@
 {
     "competition_code": "BSA",
     "competition_name": "Brasileirão Série A (Brasile)",
-    "last_updated": "2026-06-17T20:17:54.151732Z",
-    "matches_count": 0,
-    "predictions": []
+    "last_updated": "2026-06-17T20:20:31.667895Z",
+    "matches_count": 5,
+    "predictions": [
+        {
+            "HomeTeam": "CA Mineiro",
+            "AwayTeam": "EC Bahia",
+            "Prediction_1X2": "X",
+            "Probability_1": 33.3,
+            "Probability_X": 33.4,
+            "Probability_2": 33.3,
+            "Over_Under_2.5": "Under",
+            "Probability_Over": 50.0,
+            "BTTS": "No",
+            "Probability_BTTS": 50.0,
+            "Expected_Goals": 1.5,
+            "Date": "2026-07-22",
+            "Time": "00:00"
+        },
+        {
+            "HomeTeam": "Botafogo FR",
+            "AwayTeam": "Santos FC",
+            "Prediction_1X2": "X",
+            "Probability_1": 33.3,
+            "Probability_X": 33.4,
+            "Probability_2": 33.3,
+            "Over_Under_2.5": "Under",
+            "Probability_Over": 50.0,
+            "BTTS": "No",
+            "Probability_BTTS": 50.0,
+            "Expected_Goals": 1.5,
+            "Date": "2026-07-22",
+            "Time": "00:00"
+        },
+        {
+            "HomeTeam": "Chapecoense AF",
+            "AwayTeam": "CR Flamengo",
+            "Prediction_1X2": "X",
+            "Probability_1": 33.3,
+            "Probability_X": 33.4,
+            "Probability_2": 33.3,
+            "Over_Under_2.5": "Under",
+            "Probability_Over": 50.0,
+            "BTTS": "No",
+            "Probability_BTTS": 50.0,
+            "Expected_Goals": 1.5,
+            "Date": "2026-07-22",
+            "Time": "00:00"
+        },
+        {
+            "HomeTeam": "SC Corinthians Paulista",
+            "AwayTeam": "Clube do Remo",
+            "Prediction_1X2": "X",
+            "Probability_1": 33.3,
+            "Probability_X": 33.4,
+            "Probability_2": 33.3,
+            "Over_Under_2.5": "Under",
+            "Probability_Over": 50.0,
+            "BTTS": "No",
+            "Probability_BTTS": 50.0,
+            "Expected_Goals": 1.5,
+            "Date": "2026-07-22",
+            "Time": "00:00"
+        },
+        {
+            "HomeTeam": "Coritiba FBC",
+            "AwayTeam": "SE Palmeiras",
+            "Prediction_1X2": "X",
+            "Probability_1": 33.3,
+            "Probability_X": 33.4,
+            "Probability_2": 33.3,
+            "Over_Under_2.5": "Under",
+            "Probability_Over": 50.0,
+            "BTTS": "No",
+            "Probability_BTTS": 50.0,
+            "Expected_Goals": 1.5,
+            "Date": "2026-07-22",
+            "Time": "00:00"
+        }
+    ]
 }
