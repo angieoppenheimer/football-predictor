@@ -171,78 +171,78 @@ class FootballPredictor:
                 "total_points": (home_wins + away_wins) * 3 + (home_draws + away_draws),
             }
 
-        def load_upcoming_matches(self, competition_code, date_from, date_to):
-            url = f"{self.base_url}/matches"
-            params = {"competitions": competition_code, "dateFrom": date_from, "dateTo": date_to}
-            data = self._get(url, params=params)
-            
-            if not data or "matches" not in data:
-                return []
+    def load_upcoming_matches(self, competition_code, date_from, date_to):
+        url = f"{self.base_url}/matches"
+        params = {"competitions": competition_code, "dateFrom": date_from, "dateTo": date_to}
+        data = self._get(url, params=params)
+        
+        if not data or "matches" not in data:
+            return []
 
-            upcoming_matches = []
-            for match in data["matches"]:
-                home_id = match["homeTeam"]["id"]
-                away_id = match["awayTeam"]["id"]
-                if home_id in self.id_to_name and away_id in self.id_to_name:
-                    upcoming_matches.append({
-                        "Date": match["utcDate"][:10],
-                        "Time": match["utcDate"][11:16],
-                        "HomeTeam": self.id_to_name[home_id],
-                        "AwayTeam": self.id_to_name[away_id],
-                    })
-            return upcoming_matches
+        upcoming_matches = []
+        for match in data["matches"]:
+            home_id = match["homeTeam"]["id"]
+            away_id = match["awayTeam"]["id"]
+            if home_id in self.id_to_name and away_id in self.id_to_name:
+                upcoming_matches.append({
+                    "Date": match["utcDate"][:10],
+                    "Time": match["utcDate"][11:16],
+                    "HomeTeam": self.id_to_name[home_id],
+                    "AwayTeam": self.id_to_name[away_id],
+                })
+        return upcoming_matches
 
-        def predict_match(self, home_team, away_team):
-            if home_team not in self.team_data or away_team not in self.team_data:
-                return {"error": "Missing team analytics profile"}
+    def predict_match(self, home_team, away_team):
+        if home_team not in self.team_data or away_team not in self.team_data:
+            return {"error": "Missing team analytics profile"}
 
-            home_data = self.team_data[home_team]
-            away_data = self.team_data[away_team]
+        home_data = self.team_data[home_team]
+        away_data = self.team_data[away_team]
 
-            min_home_matches = max(1, home_data["home_matches"])
-            min_away_matches = max(1, away_data["away_matches"])
+        min_home_matches = max(1, home_data["home_matches"])
+        min_away_matches = max(1, away_data["away_matches"])
 
-            prob_1 = home_data["home_wins"] / min_home_matches * 0.4
-            prob_x = home_data["home_draws"] / min_home_matches * 0.3
-            prob_2 = away_data["away_wins"] / min_away_matches * 0.4
+        prob_1 = home_data["home_wins"] / min_home_matches * 0.4
+        prob_x = home_data["home_draws"] / min_home_matches * 0.3
+        prob_2 = away_data["away_wins"] / min_away_matches * 0.4
 
-            prob_1 += (home_data["recent_form"] / 15) * 0.2 - (away_data["recent_form"] / 15) * 0.1
-            prob_2 += (away_data["recent_form"] / 15) * 0.2 - (home_data["recent_form"] / 15) * 0.1
+        prob_1 += (home_data["recent_form"] / 15) * 0.2 - (away_data["recent_form"] / 15) * 0.1
+        prob_2 += (away_data["recent_form"] / 15) * 0.2 - (home_data["recent_form"] / 15) * 0.1
 
-            points_diff = home_data["total_points"] - away_data["total_points"]
-            table_factor = min(0.2, max(-0.2, points_diff / 30))
-            prob_1 += table_factor
-            prob_2 -= table_factor
+        points_diff = home_data["total_points"] - away_data["total_points"]
+        table_factor = min(0.2, max(-0.2, points_diff / 30))
+        prob_1 += table_factor
+        prob_2 -= table_factor
 
-            probabilities = {
-                "1": max(0.1, min(0.8, prob_1)),
-                "X": max(0.1, min(0.6, prob_x)),
-                "2": max(0.1, min(0.7, prob_2)),
-            }
-            total = sum(probabilities.values())
-            for key in probabilities: probabilities[key] /= total
+        probabilities = {
+            "1": max(0.1, min(0.8, prob_1)),
+            "X": max(0.1, min(0.6, prob_x)),
+            "2": max(0.1, min(0.7, prob_2)),
+        }
+        total = sum(probabilities.values())
+        for key in probabilities: probabilities[key] /= total
 
-            expected_goals = (
-                (home_data["home_goals_scored"] / min_home_matches) + (away_data["away_goals_conceded"] / min_away_matches)
-                + (away_data["away_goals_scored"] / min_away_matches) + (home_data["home_goals_conceded"] / min_home_matches)
-            ) / 2
+        expected_goals = (
+            (home_data["home_goals_scored"] / min_home_matches) + (away_data["away_goals_conceded"] / min_away_matches)
+            + (away_data["away_goals_scored"] / min_away_matches) + (home_data["home_goals_conceded"] / min_home_matches)
+        ) / 2
 
-            prob_over = ((home_data["home_overs"] / min_home_matches) + (away_data["away_overs"] / min_away_matches)) / 2
-            prob_btts = ((home_data["home_btts"] / min_home_matches) + (away_data["away_btts"] / min_away_matches)) / 2
+        prob_over = ((home_data["home_overs"] / min_home_matches) + (away_data["away_overs"] / min_away_matches)) / 2
+        prob_btts = ((home_data["home_btts"] / min_home_matches) + (away_data["away_btts"] / min_away_matches)) / 2
 
-            return {
-                "HomeTeam": home_team,
-                "AwayTeam": away_team,
-                "Prediction_1X2": max(probabilities, key=probabilities.get),
-                "Probability_1": round(probabilities["1"] * 100, 1),
-                "Probability_X": round(probabilities["X"] * 100, 1),
-                "Probability_2": round(probabilities["2"] * 100, 1),
-                "Over_Under_2.5": "Over" if prob_over > 0.5 or expected_goals > 2.5 else "Under",
-                "Probability_Over": round(prob_over * 100, 1),
-                "BTTS": "Yes" if prob_btts > 0.5 else "No",
-                "Probability_BTTS": round(prob_btts * 100, 1),
-                "Expected_Goals": round(expected_goals, 1)
-            }
+        return {
+            "HomeTeam": home_team,
+            "AwayTeam": away_team,
+            "Prediction_1X2": max(probabilities, key=probabilities.get),
+            "Probability_1": round(probabilities["1"] * 100, 1),
+            "Probability_X": round(probabilities["X"] * 100, 1),
+            "Probability_2": round(probabilities["2"] * 100, 1),
+            "Over_Under_2.5": "Over" if prob_over > 0.5 or expected_goals > 2.5 else "Under",
+            "Probability_Over": round(prob_over * 100, 1),
+            "BTTS": "Yes" if prob_btts > 0.5 else "No",
+            "Probability_BTTS": round(prob_btts * 100, 1),
+            "Expected_Goals": round(expected_goals, 1)
+        }
 
 if __name__ == "__main__":
     API_TOKEN = os.environ.get("FOOTBALL_DATA_TOKEN")
