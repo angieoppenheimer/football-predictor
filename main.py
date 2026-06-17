@@ -226,8 +226,6 @@ if __name__ == "__main__":
     predictor = FootballPredictor(API_KEY)
 
     today = datetime.now()
-    current_season = today.year if today.month > 7 else today.year - 1
-    
     date_from = today.strftime("%Y-%m-%d")
     date_to = (today + timedelta(days=7)).strftime("%Y-%m-%d")
 
@@ -242,6 +240,8 @@ if __name__ == "__main__":
 
     for code, name in COMPETITIONS.items():
         time.sleep(1)
+        
+        current_season = today.year if code == "1" else (today.year if today.month > 7 else today.year - 1)
         
         if not predictor.load_competition_data(code, current_season):
             continue
