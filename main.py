@@ -7,18 +7,24 @@ import pandas as pd
 from datetime import datetime
 
 COMPETITIONS = {
-    "CL":  "UEFA Champions League",
-    "PL":  "Premier League (Inghilterra)",
-    "PD":  "La Liga (Spagna)",
-    "BL1": "Bundesliga (Germania)",
-    "SA":  "Serie A (Italia)",
-    "FL1": "Ligue 1 (Francia)",
-    "DED": "Eredivisie (Paesi Bassi)",
-    "PPL": "Primeira Liga (Portogallo)",
-    "ELC": "Championship (Inghilterra, Serie B)",
-    "BSA": "Brasileirão Série A (Brasile)",
-    "WC":  "FIFA World Cup",
-    "EC":  "UEFA European Championship",
+    "WC": "FIFA World Cup",
+    "WW": "FIFA Women's World Cup",
+    "CWC": "FIFA Club World Cup",
+    "U20": "FIFA U-20 World Cup",
+    "U17": "FIFA U-17 World Cup",
+    "WU20": "FIFA Women's U-20 World Cup",
+    "WU17": "FIFA Women's U-17 World Cup",
+    "CC": "FIFA Confederations Cup",
+    "Q_CONMEBOL": "FIFA World Cup Qualification CONMEBOL",
+    "Q_CONCACAF": "FIFA World Cup Qualification CONCACAF",
+    "Q_UEFA": "FIFA World Cup Qualification UEFA",
+    "Q_CAF": "FIFA World Cup Qualification CAF",
+    "Q_AFC": "FIFA World Cup Qualification AFC",
+    "Q_OFC": "FIFA World Cup Qualification OFC",
+    "Q_INT": "FIFA World Cup Qualification Intercontinental Play-offs",
+    "WQ_UEFA": "FIFA Women's World Cup Qualification UEFA",
+    "WQ_OFC": "FIFA Women's World Cup Qualification OFC",
+    "WQ_INT": "FIFA Women's World Cup Qualification Intercontinental Play-offs"
 }
 
 class FootballPredictor:
@@ -26,10 +32,9 @@ class FootballPredictor:
         if not api_key:
             raise ValueError("Missing API key.")
         self.api_key = api_key
-        self.base_url = "https://v3.football.api-sports.io"
+        self.base_url = "https://api.football-data.org/v4"
         self.headers = {
-            "x-apisports-key": self.api_key,
-            "x-rapidapi-host": "v3.football.api-sports.io"
+            "X-Auth-Token": self.api_key
         }
         self.team_data = {}
 
@@ -38,37 +43,36 @@ class FootballPredictor:
         try:
             response = requests.get(url, headers=self.headers, params=params, timeout=15)
             if response.status_code == 200:
-                res_json = response.json()
-                if "errors" in res_json and res_json["errors"]:
-                    print(f"API Error [{endpoint}]: {res_json['errors']}")
-                    return None
-                return res_json
+                return response.json()
             print(f"HTTP Error {response.status_code} on {endpoint}")
             return None
         except requests.RequestException as e:
             print(f"Request Exception on {endpoint}: {e}")
             return None
 
-    def load_upcoming_matches(self, league_id):
-        url = "fixtures"
-        params = {"league": league_id}
-        data = self._get(url, params=params)
+    def load_upcoming_matches(self, league_code):
+        endpoint = f"competitions/{league_code}/matches"
+        data = self._get(endpoint)
         
-        if not data or "response" not in data or not data["response"]:
+        if not data or "matches" not in data or not data["matches"]:
             return []
 
         upcoming_matches = []
-        for item in data["response"]:
-            fixture = item["fixture"]
-            if fixture["status"]["short"] != "NS":
+        for match in data["matches"]:
+            if match["status"] not in ["TIMED", "SCHEDULED"]:
                 continue
                 
-            teams = item["teams"]
+            home_team = match["homeTeam"]["name"]
+            away_team = match["awayTeam"]["name"]
+            
+            if not home_team or not away_team:
+                continue
+
             upcoming_matches.append({
-                "Date": fixture["date"][:10],
-                "Time": fixture["date"][11:16],
-                "HomeTeam": teams["home"]["name"],
-                "AwayTeam": teams["away"]["name"],
+                "Date": match["utcDate"][:10],
+                "Time": match["utcDate"][11:16],
+                "HomeTeam": home_team,
+                "AwayTeam": away_team,
             })
         return upcoming_matches
 
@@ -105,8 +109,8 @@ if __name__ == "__main__":
     all_predictions_count = 0
 
     for code, name in COMPETITIONS.items():
-        time.sleep(1)
-        print(f"Processing {name} (ID: {code}) with Bypass Protocol...")
+        time.sleep(2)
+        print(f"Processing {name} ({code}) via Football-Data.org engine...")
             
         upcoming = predictor.load_upcoming_matches(code)
         upcoming = upcoming[:5]
