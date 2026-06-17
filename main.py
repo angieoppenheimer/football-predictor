@@ -40,10 +40,13 @@ class FootballPredictor:
             if response.status_code == 200:
                 res_json = response.json()
                 if "errors" in res_json and res_json["errors"]:
+                    print(f"API Error Log: {res_json['errors']}")
                     return None
                 return res_json
+            print(f"HTTP Error: {response.status_code}")
             return None
-        except requests.RequestException:
+        except requests.RequestException as e:
+            print(f"Request Exception: {e}")
             return None
 
     def load_competition_data(self, league_id, season):
@@ -83,6 +86,9 @@ class FootballPredictor:
             m["Under/Over 2.5"] = "Over" if (m["HomeGoals"] + m["AwayGoals"]) >= 3 else "Under"
             m["BTTS"] = "Yes" if (m["HomeGoals"] > 0 and m["AwayGoals"] > 0) else "No"
             matches.append(m)
+
+        if not matches:
+            return False
 
         self.match_data = pd.DataFrame(matches)
         self._process_team_data()
@@ -221,6 +227,7 @@ class FootballPredictor:
 if __name__ == "__main__":
     API_KEY = os.environ.get("API_FOOTBALL_KEY")
     if not API_KEY:
+        print("Error: API_FOOTBALL_KEY environment variable is empty.")
         sys.exit(1)
 
     predictor = FootballPredictor(API_KEY)
@@ -242,8 +249,10 @@ if __name__ == "__main__":
         time.sleep(1)
         
         current_season = today.year if code == "1" else (today.year if today.month > 7 else today.year - 1)
+        print(f"Processing {name} (ID: {code}) for season {current_season}...")
         
         if not predictor.load_competition_data(code, current_season):
+            print(f"Skipping {name}: No historical data found or API limit hit.")
             continue
             
         upcoming = predictor.load_upcoming_matches(code, current_season, date_from, date_to)
@@ -283,3 +292,5 @@ if __name__ == "__main__":
 
     with open("README.md", "w", encoding="utf-8") as readme_file:
         readme_file.write(readme_content)
+    
+    print("Pipeline completed successfully.")
