@@ -4,7 +4,7 @@ import time
 import json
 import requests
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime
 
 COMPETITIONS = {
     "1": "FIFA World Cup",
@@ -55,9 +55,9 @@ class FootballPredictor:
             print(f"Request Exception on {endpoint}: {e}")
             return None
 
-    def load_upcoming_matches(self, league_id, date_from, date_to):
+    def load_upcoming_matches(self, league_id):
         url = "fixtures"
-        params = {"league": league_id, "from": date_from, "to": date_to}
+        params = {"league": league_id}
         data = self._get(url, params=params)
         
         if not data or "response" not in data or not data["response"]:
@@ -66,6 +66,9 @@ class FootballPredictor:
         upcoming_matches = []
         for item in data["response"]:
             fixture = item["fixture"]
+            if fixture["status"]["short"] != "NS":
+                continue
+                
             teams = item["teams"]
             upcoming_matches.append({
                 "Date": fixture["date"][:10],
@@ -98,10 +101,6 @@ if __name__ == "__main__":
 
     predictor = FootballPredictor(API_KEY)
 
-    today = datetime.now()
-    date_from = today.strftime("%Y-%m-%d")
-    date_to = (today + timedelta(days=1)).strftime("%Y-%m-%d")
-
     output_base_dir = "data"
     os.makedirs(output_base_dir, exist_ok=True)
 
@@ -113,9 +112,10 @@ if __name__ == "__main__":
 
     for code, name in COMPETITIONS.items():
         time.sleep(1)
-        print(f"Processing {name} (ID: {code}) via Free Tier Date Protocol...")
+        print(f"Processing {name} (ID: {code}) with Bypass Protocol...")
             
-        upcoming = predictor.load_upcoming_matches(code, date_from, date_to)
+        upcoming = predictor.load_upcoming_matches(code)
+        upcoming = upcoming[:5]
         
         predictions_list = []
         for match in upcoming:
@@ -147,7 +147,7 @@ if __name__ == "__main__":
             readme_content += "\n"
 
     if all_predictions_count == 0:
-        readme_content += "### No upcoming matches scheduled for the next 24 hours across active FIFA leagues.\n"
+        readme_content += "### No upcoming matches found in the API response for the selected competitions.\n"
 
     with open("README.md", "w", encoding="utf-8") as readme_file:
         readme_file.write(readme_content)
