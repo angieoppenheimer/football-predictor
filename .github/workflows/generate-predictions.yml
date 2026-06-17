@@ -1,0 +1,44 @@
+name: Generate Predictions
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests pandas numpy
+
+      - name: Generate predictions
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: |
+          python scripts/generate_predictions.py
+
+      - name: Commit JSON files
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+          git add predictions/*.json
+
+          git diff --cached --quiet || \
+          git commit -m "daily predictions update"
+
+          git push
