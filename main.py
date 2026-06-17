@@ -7,24 +7,18 @@ import pandas as pd
 from datetime import datetime
 
 COMPETITIONS = {
-    "WC": "FIFA World Cup",
-    "WW": "FIFA Women's World Cup",
-    "CWC": "FIFA Club World Cup",
-    "U20": "FIFA U-20 World Cup",
-    "U17": "FIFA U-17 World Cup",
-    "WU20": "FIFA Women's U-20 World Cup",
-    "WU17": "FIFA Women's U-17 World Cup",
-    "CC": "FIFA Confederations Cup",
-    "Q_CONMEBOL": "FIFA World Cup Qualification CONMEBOL",
-    "Q_CONCACAF": "FIFA World Cup Qualification CONCACAF",
-    "Q_UEFA": "FIFA World Cup Qualification UEFA",
-    "Q_CAF": "FIFA World Cup Qualification CAF",
-    "Q_AFC": "FIFA World Cup Qualification AFC",
-    "Q_OFC": "FIFA World Cup Qualification OFC",
-    "Q_INT": "FIFA World Cup Qualification Intercontinental Play-offs",
-    "WQ_UEFA": "FIFA Women's World Cup Qualification UEFA",
-    "WQ_OFC": "FIFA Women's World Cup Qualification OFC",
-    "WQ_INT": "FIFA Women's World Cup Qualification Intercontinental Play-offs"
+    "CL":  "UEFA Champions League",
+    "PL":  "Premier League (Inghilterra)",
+    "PD":  "La Liga (Spagna)",
+    "BL1": "Bundesliga (Germania)",
+    "SA":  "Serie A (Italia)",
+    "FL1": "Ligue 1 (Francia)",
+    "DED": "Eredivisie (Paesi Bassi)",
+    "PPL": "Primeira Liga (Portogallo)",
+    "ELC": "Championship (Inghilterra, Serie B)",
+    "BSA": "Brasileirão Série A (Brasile)",
+    "WC":  "FIFA World Cup",
+    "EC":  "UEFA European Championship",
 }
 
 class FootballPredictor:
