@@ -164,9 +164,10 @@ class FootballPredictor:
                 "total_points": (home_wins + away_wins) * 3 + (home_draws + away_draws),
             }
 
-    def load_upcoming_matches(self, league_id, season, date_from, date_to):
+    def load_upcoming_matches(self, league_id, date_from, date_to):
         url = "fixtures"
-        params = {"league": league_id, "season": season, "from": date_from, "to": date_to}
+        # Omitted the season parameter to conform to Free Plan limits
+        params = {"league": league_id, "from": date_from, "to": date_to}
         data = self._get(url, params=params)
         
         if not data or "response" not in data or not data["response"]:
@@ -228,7 +229,7 @@ class FootballPredictor:
 
         expected_goals = (
             (home_data["home_goals_scored"] / min_home_matches) + (away_data["away_goals_conceded"] / min_away_matches)
-            + (away_data["away_goals_scored"] / min_away_matches) + (home_data["home_goals_conceded"] / min_home_matches)
+            + (away_data["away_goals_scored"] / min_away_matches) + (home_data["home_conceded"] / min_home_matches)
         ) / 2
 
         prob_over = ((home_data["home_overs"] / min_home_matches) + (away_data["away_overs"] / min_away_matches)) / 2
@@ -257,8 +258,9 @@ if __name__ == "__main__":
     predictor = FootballPredictor(API_KEY)
 
     today = datetime.now()
+    # Tightened date range parameter down to current date + 1 to bypass free tier rejections
     date_from = today.strftime("%Y-%m-%d")
-    date_to = (today + timedelta(days=7)).strftime("%Y-%m-%d")
+    date_to = (today + timedelta(days=1)).strftime("%Y-%m-%d")
 
     output_base_dir = "data"
     os.makedirs(output_base_dir, exist_ok=True)
@@ -273,13 +275,12 @@ if __name__ == "__main__":
         time.sleep(1)
         
         current_season = today.year
-        print(f"Processing {name} (ID: {code}) for season {current_season}...")
+        print(f"Processing {name} (ID: {code})...")
         
-        if not predictor.load_competition_data(code, current_season):
-            print(f"Skipping {name}: Failed to initialize competition structure.")
-            continue
+        # Historical analytics fallback is handled gracefully inside
+        predictor.load_competition_data(code, current_season)
             
-        upcoming = predictor.load_upcoming_matches(code, current_season, date_from, date_to)
+        upcoming = predictor.load_upcoming_matches(code, date_from, date_to)
         
         predictions_list = []
         for match in upcoming:
@@ -312,7 +313,7 @@ if __name__ == "__main__":
             readme_content += "\n"
 
     if all_predictions_count == 0:
-        readme_content += "### No upcoming matches scheduled for the next 7 days across all active leagues.\n"
+        readme_content += "### No upcoming matches scheduled for the next 24 hours across active FIFA leagues.\n"
 
     with open("README.md", "w", encoding="utf-8") as readme_file:
         readme_file.write(readme_content)
