@@ -24,23 +24,19 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        pip install requests
-        # Aggiungi qui pandas, numpy o altre librerie se l'algoritmo in main.py le richiede
-        # pip install pandas
+        pip install requests pandas
 
     - name: Run Predictive Analytics Engine
       env:
-        API_FOOTBALL_KEY: ${{ secrets.FOOTBALL_DATA_TOKEN }}
+        FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
       run: python main.py
 
-    - name: Commit and Push Generated JSON Data
+    - name: Commit and Push Updates
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         
-        # Aggiunge solo la cartella dei dati per evitare conflitti strani
-        git add data/
+        git add data/ README.md
         
-        # Esegue il commit solo se ci sono effettivi cambiamenti nei dati
-        git diff-index --quiet HEAD || git commit -m "Automated Data Update: $(date +'%Y-%m-%d')"
+        git diff-index --quiet HEAD || git commit -m "Data & README Auto-Update: $(date +'%Y-%m-%d')"
         git push
