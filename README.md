@@ -1,7 +1,7 @@
 # Football Predictions Dashboard
 
-Last updated: _2026-06-17T20:08:02Z (UTC)_
+Last updated: _2026-06-17T20:10:21Z (UTC)_
 
 Automated predictive analytics pipeline updating every 24 hours.
 
-### No upcoming matches scheduled for the next 24 hours across active FIFA leagues.
+### No upcoming matches found in the API response for the selected competitions.
