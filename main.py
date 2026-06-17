@@ -7,18 +7,24 @@ import pandas as pd
 from datetime import datetime
 
 COMPETITIONS = {
-    "CL":  "UEFA Champions League",
-    "PL":  "Premier League (Inghilterra)",
-    "PD":  "La Liga (Spagna)",
-    "BL1": "Bundesliga (Germania)",
-    "SA":  "Serie A (Italia)",
-    "FL1": "Ligue 1 (Francia)",
-    "DED": "Eredivisie (Paesi Bassi)",
-    "PPL": "Primeira Liga (Portogallo)",
-    "ELC": "Championship (Inghilterra, Serie B)",
-    "BSA": "Brasileirão Série A (Brasile)",
-    "WC":  "FIFA World Cup",
-    "EC":  "UEFA European Championship",
+    "WC": "FIFA World Cup",
+    "WW": "FIFA Women's World Cup",
+    "CWC": "FIFA Club World Cup",
+    "U20": "FIFA U-20 World Cup",
+    "U17": "FIFA U-17 World Cup",
+    "WU20": "FIFA Women's U-20 World Cup",
+    "WU17": "FIFA Women's U-17 World Cup",
+    "CC": "FIFA Confederations Cup",
+    "Q_CONMEBOL": "FIFA World Cup Qualification CONMEBOL",
+    "Q_CONCACAF": "FIFA World Cup Qualification CONCACAF",
+    "Q_UEFA": "FIFA World Cup Qualification UEFA",
+    "Q_CAF": "FIFA World Cup Qualification CAF",
+    "Q_AFC": "FIFA World Cup Qualification AFC",
+    "Q_OFC": "FIFA World Cup Qualification OFC",
+    "Q_INT": "FIFA World Cup Qualification Intercontinental Play-offs",
+    "WQ_UEFA": "FIFA Women's World Cup Qualification UEFA",
+    "WQ_OFC": "FIFA Women's World Cup Qualification OFC",
+    "WQ_INT": "FIFA Women's World Cup Qualification Intercontinental Play-offs"
 }
 
 class FootballPredictor:
@@ -30,7 +36,7 @@ class FootballPredictor:
         self.headers = {
             "X-Auth-Token": self.api_key
         }
-        self.team_data = {}
+        self.team_stats = {}
 
     def _get(self, endpoint, params=None):
         url = f"{self.base_url}/{endpoint}"
@@ -38,11 +44,62 @@ class FootballPredictor:
             response = requests.get(url, headers=self.headers, params=params, timeout=15)
             if response.status_code == 200:
                 return response.json()
-            print(f"HTTP Error {response.status_code} on {endpoint}")
             return None
-        except requests.RequestException as e:
-            print(f"Request Exception on {endpoint}: {e}")
+        except requests.RequestException:
             return None
+
+    def load_competition_data(self, league_code):
+        self.team_stats = {}
+        endpoint = f"competitions/{league_code}/matches"
+        data = self._get(endpoint, params={"status": "FINISHED"})
+        
+        if not data or "matches" not in data or not data["matches"]:
+            return
+
+        for match in data["matches"]:
+            home = match["homeTeam"]["name"]
+            away = match["awayTeam"]["name"]
+            
+            if not home or not away:
+                continue
+
+            for team in [home, away]:
+                if team not in self.team_stats:
+                    self.team_stats[team] = {
+                        "matches": 0, "wins": 0, "draws": 0, "losses": 0,
+                        "goals_scored": 0, "goals_conceded": 0, "overs": 0, "btts": 0
+                    }
+
+            score = match.get("score", {}).get("fullTime", {})
+            gh = score.get("home")
+            ga = score.get("away")
+            
+            if gh is None or ga is None:
+                continue
+
+            self.team_stats[home]["matches"] += 1
+            self.team_stats[away]["matches"] += 1
+            self.team_stats[home]["goals_scored"] += gh
+            self.team_stats[home]["goals_conceded"] += ga
+            self.team_stats[away]["goals_scored"] += ga
+            self.team_stats[away]["goals_conceded"] += gh
+
+            if gh > ga:
+                self.team_stats[home]["wins"] += 1
+                self.team_stats[away]["losses"] += 1
+            elif gh < ga:
+                self.team_stats[away]["wins"] += 1
+                self.team_stats[home]["losses"] += 1
+            else:
+                self.team_stats[home]["draws"] += 1
+                self.team_stats[away]["draws"] += 1
+
+            if (gh + ga) >= 3:
+                self.team_stats[home]["overs"] += 1
+                self.team_stats[away]["overs"] += 1
+            if gh > 0 and ga > 0:
+                self.team_stats[home]["btts"] += 1
+                self.team_stats[away]["btts"] += 1
 
     def load_upcoming_matches(self, league_code):
         endpoint = f"competitions/{league_code}/matches"
@@ -55,44 +112,61 @@ class FootballPredictor:
         for match in data["matches"]:
             if match["status"] not in ["TIMED", "SCHEDULED"]:
                 continue
-                
-            home_team = match["homeTeam"]["name"]
-            away_team = match["awayTeam"]["name"]
-            
-            if not home_team or not away_team:
-                continue
-
             upcoming_matches.append({
                 "Date": match["utcDate"][:10],
                 "Time": match["utcDate"][11:16],
-                "HomeTeam": home_team,
-                "AwayTeam": away_team,
+                "HomeTeam": match["homeTeam"]["name"],
+                "AwayTeam": match["awayTeam"]["name"],
             })
         return upcoming_matches
 
     def predict_match(self, home_team, away_team):
+        if home_team not in self.team_stats or away_team not in self.team_stats:
+            return {
+                "HomeTeam": home_team, "AwayTeam": away_team, "Prediction_1X2": "X",
+                "Probability_1": 33.3, "Probability_X": 33.4, "Probability_2": 33.3,
+                "Over_Under_2.5": "Under", "Probability_Over": 50.0, "BTTS": "No", "Probability_BTTS": 50.0
+            }
+
+        home = self.team_stats[home_team]
+        away = self.team_stats[away_team]
+
+        m_home = max(1, home["matches"])
+        m_away = max(1, away["matches"])
+
+        prob_1 = (home["wins"] / m_home) * 0.5 + (away["losses"] / m_away) * 0.1
+        prob_x = (home["draws"] / m_home) * 0.3 + (away["draws"] / m_away) * 0.1
+        prob_2 = (away["wins"] / m_away) * 0.5 + (home["losses"] / m_home) * 0.1
+
+        raw_probs = {"1": prob_1, "X": prob_x, "2": prob_2}
+        total = sum(raw_probs.values()) if sum(raw_probs.values()) > 0 else 1
+        
+        probs = {k: max(0.1, v / total) for k, v in raw_probs.items()}
+        new_total = sum(probs.values())
+        for k in probs: probs[k] = round((probs[k] / new_total) * 100, 1)
+
+        p_over = ((home["overs"] / m_home) + (away["overs"] / m_away)) / 2
+        p_btts = ((home["btts"] / m_home) + (away["btts"] / m_away)) / 2
+
         return {
             "HomeTeam": home_team,
             "AwayTeam": away_team,
-            "Prediction_1X2": "X",
-            "Probability_1": 33.3,
-            "Probability_X": 33.4,
-            "Probability_2": 33.3,
-            "Over_Under_2.5": "Under",
-            "Probability_Over": 50.0,
-            "BTTS": "No",
-            "Probability_BTTS": 50.0,
-            "Expected_Goals": 1.5
+            "Prediction_1X2": max(probs, key=probs.get),
+            "Probability_1": probs["1"],
+            "Probability_X": probs["X"],
+            "Probability_2": probs["2"],
+            "Over_Under_2.5": "Over" if p_over > 0.5 else "Under",
+            "Probability_Over": round(p_over * 100, 1),
+            "BTTS": "Yes" if p_btts > 0.5 else "No",
+            "Probability_BTTS": round(p_btts * 100, 1)
         }
 
 if __name__ == "__main__":
     API_KEY = os.environ.get("API_FOOTBALL_KEY")
     if not API_KEY:
-        print("Error: API_FOOTBALL_KEY environment variable is empty.")
         sys.exit(1)
 
     predictor = FootballPredictor(API_KEY)
-
     output_base_dir = "data"
     os.makedirs(output_base_dir, exist_ok=True)
 
@@ -103,9 +177,11 @@ if __name__ == "__main__":
     all_predictions_count = 0
 
     for code, name in COMPETITIONS.items():
-        time.sleep(2)
-        print(f"Processing {name} ({code}) via Football-Data.org engine...")
+        # Delay di 3 secondi per non superare il rate limit (10 richieste/min) del piano Free
+        time.sleep(3)
+        print(f"Processing real analytics for {name} ({code})...")
             
+        predictor.load_competition_data(code)
         upcoming = predictor.load_upcoming_matches(code)
         upcoming = upcoming[:5]
         
@@ -124,8 +200,7 @@ if __name__ == "__main__":
             "predictions": predictions_list
         }
 
-        file_path = os.path.join(output_base_dir, f"{code}.json")
-        with open(file_path, "w", encoding="utf-8") as f:
+        with open(os.path.join(output_base_dir, f"{code}.json"), "w", encoding="utf-8") as f:
             json.dump(payload, f, indent=4, ensure_ascii=False)
         
         if predictions_list:
@@ -144,4 +219,4 @@ if __name__ == "__main__":
     with open("README.md", "w", encoding="utf-8") as readme_file:
         readme_file.write(readme_content)
     
-    print("Pipeline executed successfully.")
+    print("Pipeline executed successfully with analytics engine engaged.")
