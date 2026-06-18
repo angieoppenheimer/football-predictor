@@ -41,15 +41,14 @@ class FootballPredictor:
             response = requests.get(url, headers=self.headers, params=params, timeout=15)
             if response.status_code == 200:
                 return response.json()
-            print(f"HTTP Error {response.status_code} on {endpoint}")
+            print(f"HTTP Error {response.status_code} on {endpoint}: {response.text[:300]}")
             return None
         except requests.RequestException as e:
             print(f"Request Exception on {endpoint}: {e}")
             return None
 
     # ------------------------------------------------------------------
-    # Historical data loading — this was missing entirely, which is why
-    # predict_match had nothing to compute from and was hardcoded.
+    # Historical data loading
     # ------------------------------------------------------------------
     def load_competition_data(self, league_code, season=None):
         """Loads finished matches for the competition and builds the
@@ -58,9 +57,12 @@ class FootballPredictor:
         data = self._get(f"competitions/{league_code}/matches", params=params)
 
         if not data or "matches" not in data:
+            print(f"  [debug] load_competition_data({league_code}): no data / no 'matches' key in response.")
             self.match_data = pd.DataFrame()
             self.team_data = {}
             return False
+
+        print(f"  [debug] load_competition_data({league_code}): API returned {len(data['matches'])} total matches.")
 
         matches = []
         id_to_name = {}
@@ -96,9 +98,12 @@ class FootballPredictor:
             m["BTTS"] = "Yes" if (home_goals > 0 and away_goals > 0) else "No"
             matches.append(m)
 
+        print(f"  [debug] load_competition_data({league_code}): {len(matches)} matches are FINISHED with a final score.")
+
         self.id_to_name = id_to_name
         self.match_data = pd.DataFrame(matches)
         self._process_team_data()
+        print(f"  [debug] load_competition_data({league_code}): team_data has stats for {len(self.team_data)} teams.")
         return True
 
     def _process_team_data(self):
@@ -173,7 +178,13 @@ class FootballPredictor:
         data = self._get(endpoint)
 
         if not data or "matches" not in data or not data["matches"]:
+            print(f"  [debug] load_upcoming_matches({league_code}): no data / empty 'matches' in response.")
             return []
+
+        status_counts = {}
+        for match in data["matches"]:
+            status_counts[match["status"]] = status_counts.get(match["status"], 0) + 1
+        print(f"  [debug] load_upcoming_matches({league_code}): {len(data['matches'])} total matches, status breakdown: {status_counts}")
 
         upcoming_matches = []
         for match in data["matches"]:
@@ -192,10 +203,12 @@ class FootballPredictor:
                 "HomeTeam": home_team,
                 "AwayTeam": away_team,
             })
+
+        print(f"  [debug] load_upcoming_matches({league_code}): {len(upcoming_matches)} matches kept after status filter.")
         return upcoming_matches
 
     # ------------------------------------------------------------------
-    # Real prediction formula (restored from the original algorithm)
+    # Real prediction formula
     # ------------------------------------------------------------------
     def predict_match(self, home_team, away_team):
         if home_team not in self.team_data or away_team not in self.team_data:
@@ -297,9 +310,6 @@ if __name__ == "__main__":
 
     predictor = FootballPredictor(API_KEY)
 
-    output_base_dir = "data"
-    os.makedirs(output_base_dir, exist_ok=True)
-
     readme_content = "# Football Predictions Dashboard\n\n"
     readme_content += f"Last updated: _{datetime.utcnow().isoformat()[:-7]}Z (UTC)_\n\n"
     readme_content += "Automated predictive analytics pipeline updating every 24 hours.\n\n"
@@ -310,9 +320,6 @@ if __name__ == "__main__":
         time.sleep(2)
         print(f"Processing {name} ({code}) via Football-Data.org engine...")
 
-        # Load historical data first -> builds predictor.team_data,
-        # which predict_match needs. Without this step every prediction
-        # falls back to the "insufficient data" branch.
         loaded = predictor.load_competition_data(code)
         if not loaded:
             print(f"  Warning: could not load historical data for {code}, skipping season stats.")
@@ -327,18 +334,6 @@ if __name__ == "__main__":
             pred["Date"] = match["Date"]
             pred["Time"] = match["Time"]
             predictions_list.append(pred)
-
-        payload = {
-            "competition_code": code,
-            "competition_name": name,
-            "last_updated": datetime.utcnow().isoformat() + "Z",
-            "matches_count": len(predictions_list),
-            "predictions": predictions_list
-        }
-
-        file_path = os.path.join(output_base_dir, f"{code}.json")
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(payload, f, indent=4, ensure_ascii=False)
 
         if predictions_list:
             all_predictions_count += len(predictions_list)
