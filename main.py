@@ -181,6 +181,8 @@ class FootballPredictor:
             print(f"  [debug] load_upcoming_matches({league_code}): no data / empty 'matches' in response.")
             return []
 
+        # Diagnostic: show what statuses the API is actually returning,
+        # so we can see if the filter below is the thing eating the matches.
         status_counts = {}
         for match in data["matches"]:
             status_counts[match["status"]] = status_counts.get(match["status"], 0) + 1
@@ -197,11 +199,20 @@ class FootballPredictor:
             if not home_team or not away_team:
                 continue
 
+            # The "season" the match belongs to, per the API's own season
+            # object — this is what we need to align the historical-stats
+            # call to, not a guess based on today's date.
+            season_year = None
+            season_obj = match.get("season")
+            if season_obj and season_obj.get("startDate"):
+                season_year = int(season_obj["startDate"][:4])
+
             upcoming_matches.append({
                 "Date": match["utcDate"][:10],
                 "Time": match["utcDate"][11:16],
                 "HomeTeam": home_team,
                 "AwayTeam": away_team,
+                "SeasonYear": season_year,
             })
 
         print(f"  [debug] load_upcoming_matches({league_code}): {len(upcoming_matches)} matches kept after status filter.")
@@ -316,17 +327,45 @@ if __name__ == "__main__":
 
     all_predictions_count = 0
 
+    MIN_FINISHED_MATCHES_FOR_STATS = 20  # rough floor: enough games for the
+    # per-team aggregation to mean anything (a handful of matchdays across
+    # the league, not just 1-2 games for a couple of teams).
+
     for code, name in COMPETITIONS.items():
         time.sleep(2)
         print(f"Processing {name} ({code}) via Football-Data.org engine...")
 
-        loaded = predictor.load_competition_data(code)
-        if not loaded:
-            print(f"  Warning: could not load historical data for {code}, skipping season stats.")
-
-        time.sleep(2)
+        # 1) Fetch upcoming matches first — this tells us which season
+        #    the API currently considers "active" for this competition,
+        #    which near a season changeover (the API treats a season as
+        #    active up to 30 days before it starts) is NOT necessarily
+        #    the season with enough finished matches to compute stats.
         upcoming = predictor.load_upcoming_matches(code)
         upcoming = upcoming[:5]
+
+        upcoming_season_year = None
+        for m in upcoming:
+            if m.get("SeasonYear"):
+                upcoming_season_year = m["SeasonYear"]
+                break
+
+        # 2) Load historical stats for that season. If it doesn't have
+        #    enough finished matches yet (e.g. brand new season with 0-1
+        #    matchdays played), fall back to the previous season so the
+        #    model has something real to compute from.
+        loaded = predictor.load_competition_data(code, season=upcoming_season_year)
+        finished_count = len(predictor.match_data) if not predictor.match_data.empty else 0
+
+        if not loaded or finished_count < MIN_FINISHED_MATCHES_FOR_STATS:
+            fallback_season = (upcoming_season_year - 1) if upcoming_season_year else None
+            print(f"  [debug] Only {finished_count} finished matches for season={upcoming_season_year}; "
+                  f"falling back to season={fallback_season} for stats.")
+            time.sleep(2)
+            loaded = predictor.load_competition_data(code, season=fallback_season)
+            if not loaded:
+                print(f"  Warning: could not load historical data for {code} even with fallback season.")
+
+        time.sleep(2)
 
         predictions_list = []
         for match in upcoming:
