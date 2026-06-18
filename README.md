@@ -1,17 +1,8 @@
 # Football Predictions Dashboard
 
-Last updated: _2026-06-18T06:48:15Z (UTC)_
+Last updated: _2026-06-18T12:33:49Z (UTC)_
 
 Automated predictive analytics pipeline updating every 24 hours.
-
-## Serie A (Italia) (SA)
-| Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
-| :--- | :--- | :---: | :---: | :---: | :---: |
-| 2026-08-23 16:30 | **Udinese Calcio** vs **Como 1907** | `2` | 13.6% / 13.6% / 72.9% | Under (42.1%) | No (36.8%) |
-| 2026-08-23 16:30 | **Bologna FC 1909** vs **SS Lazio** | `1` | 55.8% / 22.1% / 22.1% | Under (26.3%) | No (23.7%) |
-| 2026-08-23 16:30 | **Genoa CFC** vs **SSC Napoli** | `2` | 13.7% / 13.7% / 72.6% | Under (50.0%) | No (42.1%) |
-| 2026-08-23 16:30 | **FC Internazionale Milano** vs **AC Monza** | N/A | insufficient data | — | — |
-| 2026-08-23 16:30 | **Atalanta BC** vs **US Sassuolo Calcio** | `1` | 68.2% / 15.9% / 15.9% | Under (44.7%) | No (50.0%) |
 
 ## Brasileirão Série A (Brasile) (BSA)
 | Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
