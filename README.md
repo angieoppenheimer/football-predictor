@@ -1,6 +1,6 @@
 # Football Predictions Dashboard
 
-Last updated: _2026-06-18T12:33:49Z (UTC)_
+Last updated: _2026-06-19T06:12:29Z (UTC)_
 
 Automated predictive analytics pipeline updating every 24 hours.
 
@@ -16,9 +16,9 @@ Automated predictive analytics pipeline updating every 24 hours.
 ## FIFA World Cup (WC)
 | Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| 2026-06-18 16:00 | **Czechia** vs **South Africa** | `1` | 33.3% / 33.3% / 33.3% | Under (0.0%) | No (0.0%) |
-| 2026-06-18 19:00 | **Switzerland** vs **Bosnia-Herzegovina** | `1` | 33.3% / 33.3% / 33.3% | Under (0.0%) | No (50.0%) |
-| 2026-06-18 22:00 | **Canada** vs **Qatar** | `X` | 20.0% / 60.0% / 20.0% | Under (0.0%) | No (50.0%) |
-| 2026-06-19 01:00 | **Mexico** vs **South Korea** | `1` | 67.7% / 16.1% / 16.1% | Under (0.0%) | No (0.0%) |
 | 2026-06-19 19:00 | **United States** vs **Australia** | `1` | 67.7% / 16.1% / 16.1% | Under (50.0%) | No (50.0%) |
+| 2026-06-19 22:00 | **Scotland** vs **Morocco** | `1` | 33.3% / 33.3% / 33.3% | Under (0.0%) | No (50.0%) |
+| 2026-06-20 00:30 | **Brazil** vs **Haiti** | `X` | 20.0% / 60.0% / 20.0% | Under (0.0%) | No (50.0%) |
+| 2026-06-20 03:00 | **Turkey** vs **Paraguay** | `1` | 33.3% / 33.3% / 33.3% | Under (50.0%) | No (50.0%) |
+| 2026-06-20 17:00 | **Netherlands** vs **Sweden** | `X` | 20.0% / 60.0% / 20.0% | Under (50.0%) | No (50.0%) |
 
