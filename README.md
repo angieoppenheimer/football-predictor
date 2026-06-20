@@ -1,6 +1,6 @@
 # Football Predictions Dashboard
 
-Last updated: _2026-06-19T13:01:25Z (UTC)_
+Last updated: _2026-06-20T10:21:02Z (UTC)_
 
 Automated predictive analytics pipeline updating every 24 hours.
 
@@ -25,9 +25,9 @@ Automated predictive analytics pipeline updating every 24 hours.
 ## FIFA World Cup (WC)
 | Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| 2026-06-19 19:00 | **United States** vs **Australia** | `1` | 67.7% / 16.1% / 16.1% | Under (50.0%) | No (50.0%) |
-| 2026-06-19 22:00 | **Scotland** vs **Morocco** | `1` | 33.3% / 33.3% / 33.3% | Under (0.0%) | No (50.0%) |
-| 2026-06-20 00:30 | **Brazil** vs **Haiti** | `X` | 20.0% / 60.0% / 20.0% | Under (0.0%) | No (50.0%) |
-| 2026-06-20 03:00 | **Turkey** vs **Paraguay** | `1` | 33.3% / 33.3% / 33.3% | Under (50.0%) | No (50.0%) |
 | 2026-06-20 17:00 | **Netherlands** vs **Sweden** | `X` | 20.0% / 60.0% / 20.0% | Under (50.0%) | No (50.0%) |
+| 2026-06-20 20:00 | **Germany** vs **Ivory Coast** | `1` | 67.7% / 16.1% / 16.1% | Over (50.0%) | No (50.0%) |
+| 2026-06-21 00:00 | **Ecuador** vs **Curaçao** | `1` | 33.3% / 33.3% / 33.3% | Over (50.0%) | No (50.0%) |
+| 2026-06-21 04:00 | **Tunisia** vs **Japan** | `1` | 33.3% / 33.3% / 33.3% | Under (50.0%) | No (50.0%) |
+| 2026-06-21 16:00 | **Spain** vs **Saudi Arabia** | `X` | 20.0% / 60.0% / 20.0% | Under (0.0%) | No (0.0%) |
 
