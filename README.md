@@ -1,33 +1,33 @@
 # Football Predictions Dashboard
 
-Last updated: _2026-06-23T11:44:04Z (UTC)_
+Last updated: _2026-06-24T10:36:52Z (UTC)_
 
 Automated predictive analytics pipeline updating every 24 hours.
 
-## Serie A (Italia) (SA)
+## Premier League (Inghilterra) (PL)
 | Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| 2026-08-23 16:30 | **Udinese Calcio** vs **Como 1907** | N/A | insufficient data | — | — |
-| 2026-08-23 16:30 | **Bologna FC 1909** vs **SS Lazio** | N/A | insufficient data | — | — |
-| 2026-08-23 16:30 | **Genoa CFC** vs **SSC Napoli** | N/A | insufficient data | — | — |
-| 2026-08-23 16:30 | **FC Internazionale Milano** vs **AC Monza** | N/A | insufficient data | — | — |
-| 2026-08-23 16:30 | **Atalanta BC** vs **US Sassuolo Calcio** | N/A | insufficient data | — | — |
+| 2026-08-21 19:00 | **Arsenal FC** vs **Coventry City FC** | N/A | insufficient data | — | — |
+| 2026-08-22 11:30 | **Hull City AFC** vs **Manchester United FC** | N/A | insufficient data | — | — |
+| 2026-08-22 14:00 | **Ipswich Town FC** vs **Sunderland AFC** | N/A | insufficient data | — | — |
+| 2026-08-22 14:00 | **Nottingham Forest FC** vs **Leeds United FC** | `2` | 23.7% / 30.0% / 46.3% | Over (47.4%) | Yes (55.3%) |
+| 2026-08-22 14:00 | **Everton FC** vs **Crystal Palace FC** | `1` | 57.7% / 21.1% / 21.1% | Over (57.9%) | Yes (52.6%) |
 
 ## Brasileirão Série A (Brasile) (BSA)
 | Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| 2026-07-22 00:00 | **CA Mineiro** vs **EC Bahia** | `2` | 38.1% / 18.4% / 43.5% | Over (62.5%) | Yes (62.5%) |
-| 2026-07-22 00:00 | **Botafogo FR** vs **Santos FC** | `1` | 52.9% / 23.5% / 23.5% | Over (87.5%) | Yes (79.5%) |
-| 2026-07-22 00:00 | **Chapecoense AF** vs **CR Flamengo** | `2` | 13.2% / 17.6% / 69.1% | Over (66.7%) | Yes (66.7%) |
-| 2026-07-22 00:00 | **SC Corinthians Paulista** vs **Clube do Remo** | `1` | 68.3% / 15.8% / 15.8% | Under (38.9%) | No (38.9%) |
-| 2026-07-22 00:00 | **Coritiba FBC** vs **SE Palmeiras** | `2` | 14.1% / 15.9% / 70.0% | Under (40.3%) | Yes (52.8%) |
+| 2026-07-16 22:30 | **Botafogo FR** vs **Santos FC** | `1` | 52.9% / 23.5% / 23.5% | Over (87.5%) | Yes (79.5%) |
+| 2026-07-16 22:30 | **EC Vitória** vs **CR Vasco da Gama** | `1` | 68.4% / 15.8% / 15.8% | Over (43.8%) | Yes (56.2%) |
+| 2026-07-17 00:30 | **Mirassol FC** vs **Grêmio FBPA** | `2` | 25.9% / 25.9% / 48.3% | Under (44.4%) | Yes (61.1%) |
+| 2026-07-18 00:30 | **Fluminense FC** vs **RB Bragantino** | `1` | 51.9% / 14.2% / 33.9% | Over (55.6%) | Yes (55.6%) |
+| 2026-07-21 22:30 | **CA Mineiro** vs **EC Bahia** | `2` | 38.1% / 18.4% / 43.5% | Over (62.5%) | Yes (62.5%) |
 
 ## FIFA World Cup (WC)
 | Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| 2026-06-23 17:00 | **Portugal** vs **Uzbekistan** | `X` | 20.0% / 60.0% / 20.0% | Under (0.0%) | No (50.0%) |
-| 2026-06-23 20:00 | **England** vs **Ghana** | `1` | 67.7% / 16.1% / 16.1% | Over (50.0%) | No (50.0%) |
-| 2026-06-23 23:00 | **Panama** vs **Croatia** | `1` | 33.3% / 33.3% / 33.3% | Over (50.0%) | No (50.0%) |
-| 2026-06-24 02:00 | **Colombia** vs **Congo DR** | `1` | 33.3% / 33.3% / 33.3% | Under (0.0%) | No (50.0%) |
 | 2026-06-24 19:00 | **Switzerland** vs **Canada** | `1` | 68.1% / 16.0% / 16.0% | Under (50.0%) | No (50.0%) |
+| 2026-06-24 19:00 | **Bosnia-Herzegovina** vs **Qatar** | `1` | 33.3% / 33.3% / 33.3% | Over (50.0%) | No (0.0%) |
+| 2026-06-24 22:00 | **Morocco** vs **Haiti** | `1` | 48.3% / 25.9% / 25.9% | Under (50.0%) | No (0.0%) |
+| 2026-06-24 22:00 | **Scotland** vs **Brazil** | `1` | 33.3% / 33.3% / 33.3% | Under (0.0%) | No (0.0%) |
+| 2026-06-25 01:00 | **Czechia** vs **Mexico** | `X` | 15.6% / 46.9% / 37.5% | Under (0.0%) | No (50.0%) |
 
