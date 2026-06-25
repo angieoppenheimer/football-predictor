@@ -1,6 +1,6 @@
 # Football Predictions Dashboard
 
-Last updated: _2026-06-24T10:36:52Z (UTC)_
+Last updated: _2026-06-25T10:29:43Z (UTC)_
 
 Automated predictive analytics pipeline updating every 24 hours.
 
@@ -12,6 +12,15 @@ Automated predictive analytics pipeline updating every 24 hours.
 | 2026-08-22 14:00 | **Ipswich Town FC** vs **Sunderland AFC** | N/A | insufficient data | — | — |
 | 2026-08-22 14:00 | **Nottingham Forest FC** vs **Leeds United FC** | `2` | 23.7% / 30.0% / 46.3% | Over (47.4%) | Yes (55.3%) |
 | 2026-08-22 14:00 | **Everton FC** vs **Crystal Palace FC** | `1` | 57.7% / 21.1% / 21.1% | Over (57.9%) | Yes (52.6%) |
+
+## Serie A (Italia) (SA)
+| Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| 2026-08-23 16:30 | **Udinese Calcio** vs **Como 1907** | N/A | insufficient data | — | — |
+| 2026-08-23 16:30 | **Bologna FC 1909** vs **SS Lazio** | N/A | insufficient data | — | — |
+| 2026-08-23 16:30 | **Genoa CFC** vs **SSC Napoli** | N/A | insufficient data | — | — |
+| 2026-08-23 16:30 | **FC Internazionale Milano** vs **AC Monza** | N/A | insufficient data | — | — |
+| 2026-08-23 16:30 | **Atalanta BC** vs **US Sassuolo Calcio** | N/A | insufficient data | — | — |
 
 ## Brasileirão Série A (Brasile) (BSA)
 | Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
@@ -25,9 +34,9 @@ Automated predictive analytics pipeline updating every 24 hours.
 ## FIFA World Cup (WC)
 | Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| 2026-06-24 19:00 | **Switzerland** vs **Canada** | `1` | 68.1% / 16.0% / 16.0% | Under (50.0%) | No (50.0%) |
-| 2026-06-24 19:00 | **Bosnia-Herzegovina** vs **Qatar** | `1` | 33.3% / 33.3% / 33.3% | Over (50.0%) | No (0.0%) |
-| 2026-06-24 22:00 | **Morocco** vs **Haiti** | `1` | 48.3% / 25.9% / 25.9% | Under (50.0%) | No (0.0%) |
-| 2026-06-24 22:00 | **Scotland** vs **Brazil** | `1` | 33.3% / 33.3% / 33.3% | Under (0.0%) | No (0.0%) |
-| 2026-06-25 01:00 | **Czechia** vs **Mexico** | `X` | 15.6% / 46.9% / 37.5% | Under (0.0%) | No (50.0%) |
+| 2026-06-25 20:00 | **Ecuador** vs **Germany** | `X` | 15.6% / 46.9% / 37.5% | Under (0.0%) | No (0.0%) |
+| 2026-06-25 20:00 | **Curaçao** vs **Ivory Coast** | `1` | 33.3% / 33.3% / 33.3% | Under (50.0%) | No (50.0%) |
+| 2026-06-25 23:00 | **Tunisia** vs **Netherlands** | `2` | 25.9% / 25.9% / 48.3% | Under (50.0%) | No (0.0%) |
+| 2026-06-25 23:00 | **Japan** vs **Sweden** | `1` | 33.3% / 33.3% / 33.3% | Over (50.0%) | No (50.0%) |
+| 2026-06-26 02:00 | **Turkey** vs **United States** | `2` | 20.8% / 20.8% / 58.3% | Under (0.0%) | No (0.0%) |
 
