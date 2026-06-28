@@ -1,6 +1,6 @@
 # Football Predictions Dashboard
 
-Last updated: _2026-06-27T09:19:54Z (UTC)_
+Last updated: _2026-06-28T10:13:43Z (UTC)_
 
 Automated predictive analytics pipeline updating every 24 hours.
 
@@ -34,9 +34,9 @@ Automated predictive analytics pipeline updating every 24 hours.
 ## FIFA World Cup (WC)
 | Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| 2026-06-27 21:00 | **Panama** vs **England** | `2` | 25.9% / 25.9% / 48.3% | Under (0.0%) | No (0.0%) |
-| 2026-06-27 21:00 | **Croatia** vs **Ghana** | `1` | 33.3% / 33.3% / 33.3% | Under (0.0%) | No (0.0%) |
-| 2026-06-27 23:30 | **Colombia** vs **Portugal** | `1` | 72.2% / 13.9% / 13.9% | Under (0.0%) | No (0.0%) |
-| 2026-06-27 23:30 | **Congo DR** vs **Uzbekistan** | `1` | 33.3% / 33.3% / 33.3% | Under (50.0%) | No (0.0%) |
-| 2026-06-28 02:00 | **Jordan** vs **Argentina** | `2` | 20.8% / 20.8% / 58.3% | Under (50.0%) | No (50.0%) |
+| 2026-06-28 19:00 | **South Africa** vs **Canada** | `1` | 68.1% / 16.0% / 16.0% | Under (50.0%) | No (50.0%) |
+| 2026-06-29 17:00 | **Brazil** vs **Japan** | `1` | 51.9% / 23.8% / 24.3% | Over (75.0%) | No (50.0%) |
+| 2026-06-29 20:30 | **Germany** vs **Paraguay** | `1` | 67.8% / 13.0% / 19.1% | Over (75.0%) | Yes (75.0%) |
+| 2026-06-30 01:00 | **Netherlands** vs **Morocco** | `1` | 38.3% / 23.3% / 38.3% | Over (50.0%) | Yes (75.0%) |
+| 2026-06-30 17:00 | **Ivory Coast** vs **Norway** | `1` | 44.9% / 10.2% / 44.9% | Over (50.0%) | No (50.0%) |
 
