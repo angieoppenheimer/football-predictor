@@ -1,6 +1,6 @@
 # Football Predictions Dashboard
 
-Last updated: _2026-06-29T14:41:13Z (UTC)_
+Last updated: _2026-06-30T11:28:29Z (UTC)_
 
 Automated predictive analytics pipeline updating every 24 hours.
 
@@ -34,9 +34,9 @@ Automated predictive analytics pipeline updating every 24 hours.
 ## FIFA World Cup (WC)
 | Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| 2026-06-29 17:00 | **Brazil** vs **Japan** | `1` | 51.9% / 23.8% / 24.3% | Over (75.0%) | No (50.0%) |
-| 2026-06-29 20:30 | **Germany** vs **Paraguay** | `1` | 67.8% / 13.0% / 19.1% | Over (75.0%) | Yes (75.0%) |
-| 2026-06-30 01:00 | **Netherlands** vs **Morocco** | `1` | 38.3% / 23.3% / 38.3% | Over (50.0%) | Yes (75.0%) |
 | 2026-06-30 17:00 | **Ivory Coast** vs **Norway** | `1` | 44.9% / 10.2% / 44.9% | Over (50.0%) | No (50.0%) |
 | 2026-06-30 21:00 | **France** vs **Sweden** | `1` | 76.7% / 11.6% / 11.6% | Over (75.0%) | Yes (75.0%) |
+| 2026-07-01 01:00 | **Mexico** vs **Ecuador** | `1` | 76.7% / 11.6% / 11.6% | Under (0.0%) | No (0.0%) |
+| 2026-07-01 16:00 | **England** vs **Congo DR** | `1` | 59.5% / 24.3% / 16.2% | Under (25.0%) | No (50.0%) |
+| 2026-07-01 20:00 | **Belgium** vs **Senegal** | `X` | 22.1% / 58.4% / 19.5% | Over (50.0%) | Yes (75.0%) |
 
