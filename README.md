@@ -1,6 +1,6 @@
 # Football Predictions Dashboard
 
-Last updated: _2026-06-30T11:28:29Z (UTC)_
+Last updated: _2026-07-01T11:41:19Z (UTC)_
 
 Automated predictive analytics pipeline updating every 24 hours.
 
@@ -34,9 +34,9 @@ Automated predictive analytics pipeline updating every 24 hours.
 ## FIFA World Cup (WC)
 | Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| 2026-06-30 17:00 | **Ivory Coast** vs **Norway** | `1` | 44.9% / 10.2% / 44.9% | Over (50.0%) | No (50.0%) |
-| 2026-06-30 21:00 | **France** vs **Sweden** | `1` | 76.7% / 11.6% / 11.6% | Over (75.0%) | Yes (75.0%) |
-| 2026-07-01 01:00 | **Mexico** vs **Ecuador** | `1` | 76.7% / 11.6% / 11.6% | Under (0.0%) | No (0.0%) |
 | 2026-07-01 16:00 | **England** vs **Congo DR** | `1` | 59.5% / 24.3% / 16.2% | Under (25.0%) | No (50.0%) |
 | 2026-07-01 20:00 | **Belgium** vs **Senegal** | `X` | 22.1% / 58.4% / 19.5% | Over (50.0%) | Yes (75.0%) |
+| 2026-07-02 00:00 | **United States** vs **Bosnia-Herzegovina** | `1` | 72.2% / 13.9% / 13.9% | Over (50.0%) | Yes (75.0%) |
+| 2026-07-02 19:00 | **Spain** vs **Austria** | `1` | 59.5% / 24.3% / 16.2% | Over (50.0%) | No (25.0%) |
+| 2026-07-02 23:00 | **Portugal** vs **Croatia** | `2` | 31.0% / 24.1% / 44.9% | Over (50.0%) | No (50.0%) |
 
