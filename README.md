@@ -1,6 +1,6 @@
 # Football Predictions Dashboard
 
-Last updated: _2026-07-01T11:41:19Z (UTC)_
+Last updated: _2026-07-02T10:19:29Z (UTC)_
 
 Automated predictive analytics pipeline updating every 24 hours.
 
@@ -12,6 +12,15 @@ Automated predictive analytics pipeline updating every 24 hours.
 | 2026-08-22 14:00 | **Ipswich Town FC** vs **Sunderland AFC** | N/A | insufficient data | — | — |
 | 2026-08-22 14:00 | **Nottingham Forest FC** vs **Leeds United FC** | `2` | 23.7% / 30.0% / 46.3% | Over (47.4%) | Yes (55.3%) |
 | 2026-08-22 14:00 | **Everton FC** vs **Crystal Palace FC** | `1` | 57.7% / 21.1% / 21.1% | Over (57.9%) | Yes (52.6%) |
+
+## La Liga (Spagna) (PD)
+| Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| 2026-08-16 15:00 | **Club Atlético de Madrid** vs **Málaga CF** | N/A | insufficient data | — | — |
+| 2026-08-16 15:00 | **Real Racing Club de Santander** vs **Villarreal CF** | N/A | insufficient data | — | — |
+| 2026-08-16 15:00 | **FC Barcelona** vs **Athletic Club** | `1` | 77.6% / 11.2% / 11.2% | Over (65.8%) | No (50.0%) |
+| 2026-08-16 15:00 | **Real Madrid CF** vs **Real Sociedad de Fútbol** | `1` | 77.2% / 11.4% / 11.4% | Over (50.0%) | Yes (68.4%) |
+| 2026-08-16 15:00 | **RCD Espanyol de Barcelona** vs **Levante UD** | `1` | 61.1% / 19.5% / 19.5% | Over (44.7%) | No (50.0%) |
 
 ## Serie A (Italia) (SA)
 | Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
@@ -34,9 +43,9 @@ Automated predictive analytics pipeline updating every 24 hours.
 ## FIFA World Cup (WC)
 | Date & Time | Match | 1X2 | 1 / X / 2 % | O/U 2.5 | BTTS |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| 2026-07-01 16:00 | **England** vs **Congo DR** | `1` | 59.5% / 24.3% / 16.2% | Under (25.0%) | No (50.0%) |
-| 2026-07-01 20:00 | **Belgium** vs **Senegal** | `X` | 22.1% / 58.4% / 19.5% | Over (50.0%) | Yes (75.0%) |
-| 2026-07-02 00:00 | **United States** vs **Bosnia-Herzegovina** | `1` | 72.2% / 13.9% / 13.9% | Over (50.0%) | Yes (75.0%) |
 | 2026-07-02 19:00 | **Spain** vs **Austria** | `1` | 59.5% / 24.3% / 16.2% | Over (50.0%) | No (25.0%) |
 | 2026-07-02 23:00 | **Portugal** vs **Croatia** | `2` | 31.0% / 24.1% / 44.9% | Over (50.0%) | No (50.0%) |
+| 2026-07-03 03:00 | **Switzerland** vs **Algeria** | `1` | 73.3% / 12.9% / 13.8% | Over (100.0%) | Yes (75.0%) |
+| 2026-07-03 18:00 | **Australia** vs **Egypt** | `1` | 50.9% / 13.2% / 36.0% | Under (25.0%) | No (50.0%) |
+| 2026-07-03 22:00 | **Argentina** vs **Cape Verde Islands** | `1` | 77.8% / 11.1% / 11.1% | Under (50.0%) | No (25.0%) |
 
